@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
+require('dotenv').config()
 const todoRoutes = require('./routes/todo');
+const sequelize = require('./utils/database');
 
 const app = express();
 
@@ -16,6 +18,15 @@ app.use( (req, res, next) => {
     res.sendFile('/index.html');    // Через те що папка public в статиці, то сервер бачить цей файл в корні
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on PORT ${PORT}...`);
-});
+async function start() {
+    try {
+        await sequelize.sync();
+        app.listen(PORT, () => {
+            console.log(`Server is running on PORT ${PORT}...`);
+        });
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+start();
