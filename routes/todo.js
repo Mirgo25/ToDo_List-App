@@ -20,10 +20,10 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         const todo = await Todo.create({
-            title: req.body.title,
+            title: req.body.title,          // Функція fetch з фронтенда (з функції addTodo) передала body в якому title
             done: false
         })
-        res.status(201).json({todo});
+        res.status(201).json({todo});       // Response
     } catch (e) {
         console.log(e);
         res.status(500).json({
@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
     try {
         const todo = await Todo.findByPk(+req.params.id);
-        todo.done = req.body.done;      // Функція fetch передала body в якому done: true
+        todo.done = req.body.done;      // Функція fetch з фронтенда (з функції completeTodo) передала body в якому done: true
         await todo.save();
         res.status(200).json({todo});   // Повертаємо response зі статусом 200 на фронтенд з json об'єкт todo 
     } catch (e) {
@@ -48,9 +48,16 @@ router.put('/:id', async (req, res) => {
 });
 
 // Видалення певної задачі
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
-        
+        const todos = await Todo.findAll({
+            where: {                        // Для прикладу: як використовувати умову WHERE 
+                id: +req.params.id
+            }
+        });                     
+        const todo = todos[0];
+        await todo.destroy();
+        res.status(204).json({});
     } catch (e) {
         console.log(e);
         res.status(500).json({
