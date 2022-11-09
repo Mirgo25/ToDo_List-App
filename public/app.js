@@ -38,6 +38,21 @@ new Vue({
       },
       removeTodo(id) {
         this.todos = this.todos.filter(t => t.id !== id)
+      },
+      completeTodo(id) {
+        fetch('/api/todo/' + id, {
+          method: 'put',
+          headers: {'Content-Type': 'application/json'},   // Хедери описуємо в тому випадку коли щось передаємо на сервер
+          body: JSON.stringify({done: true})               // Відправляємо на сервер що done тепер рівне true
+        })
+          .then(res => res.json())
+          .then( ({todo}) => {
+            // console.log("Clientside todo: ", todo)
+            const idx = this.todos.findIndex(t => t.id === todo.id)
+            this.todos[idx].updatedAt = todo.updatedAt 
+          })
+          .catch(e => console.log(e))
+        console.log(id)
       }
     },
     filters: {

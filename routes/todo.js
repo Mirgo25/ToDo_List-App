@@ -33,9 +33,12 @@ router.post('/', async (req, res) => {
 });
 
 // Зміна певної задачі
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
-        
+        const todo = await Todo.findByPk(+req.params.id);
+        todo.done = req.body.done;      // Функція fetch передала body в якому done: true
+        await todo.save();
+        res.status(200).json({todo});   // Повертаємо response зі статусом 200 на фронтенд з json об'єкт todo 
     } catch (e) {
         console.log(e);
         res.status(500).json({
